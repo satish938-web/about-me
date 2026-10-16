@@ -26,7 +26,16 @@ const dockLabels: Record<(typeof dockOrder)[number], string> = {
   skills: "Skills",
   photos: "Photos",
   contact: "Contact",
-  sitemap: "Site map",
+  sitemap: "Map",
+};
+
+const dockGlyph: Record<(typeof dockOrder)[number], Glyph> = {
+  about: "doc",
+  projects: "folder",
+  skills: "folder",
+  photos: "photo",
+  contact: "mail",
+  sitemap: "doc",
 };
 
 const titles: Record<DeskId, string> = {
@@ -214,7 +223,7 @@ function NowNote({
 
   return (
     <div
-      className="paper-scroll min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-16 text-[13px] leading-[1.45rem] text-[#1c1a16]"
+      className="paper-scroll min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6 text-[13px] leading-[1.45rem] text-[#1c1a16]"
       style={{
         backgroundColor: "#f7f6ef",
         backgroundImage:
@@ -655,7 +664,7 @@ function WindowBody({
       { card: "border-indigo-200 bg-indigo-50", title: "text-indigo-800", pill: "bg-indigo-600 text-white" },
     ];
     return (
-      <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f3f0ff] pb-16 text-[#1c1a16]">
+      <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f3f0ff] pb-4 text-[#1c1a16]">
         <div className="bg-[linear-gradient(135deg,#4c1d95_0%,#0369a1_55%,#ea580c_130%)] px-4 py-4 text-white">
           <p className="text-[10px] tracking-[0.2em] text-amber-200 uppercase">All-rounder</p>
           <h2 className="mt-1 text-xl leading-tight font-semibold tracking-tight">Full product, one engineer</h2>
@@ -966,7 +975,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
               onClick={toggleSound}
               className="cursor-pointer rounded-full bg-white/90 px-2 py-0.5 text-[10px] text-[#1c1a16] [text-shadow:none]"
             >
-              {compact ? (sound ? "snd" : "mute") : `sound: ${sound ? "on" : "off"}`}
+              {sound ? "On" : "Off"}
             </button>
             <span className="truncate">{compact ? clock.split(" ").slice(-2).join(" ") : clock}</span>
           </div>
@@ -1012,8 +1021,9 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
           ) : null}
         </div>
 
-        <div className="relative z-10 h-[calc(100%-1.75rem)]" onClick={() => setMenu(null)}>
-          <div className="desk-icons absolute top-2 right-1 bottom-16 z-20 grid w-[11.2rem] grid-flow-col grid-rows-5 content-start justify-items-center gap-y-1 overflow-y-auto sm:right-3 sm:bottom-14 sm:w-[5.6rem] sm:grid-flow-row sm:grid-rows-none sm:justify-items-stretch sm:gap-1">
+        <div className="relative z-10 flex h-[calc(100%-1.75rem)] flex-col" onClick={() => setMenu(null)}>
+          <div className="relative min-h-0 flex-1">
+          <div className="desk-icons absolute top-2 right-1 bottom-2 z-20 grid w-[11.2rem] grid-flow-col grid-rows-5 content-start justify-items-center gap-y-1 overflow-y-auto sm:right-3 sm:w-[5.6rem] sm:grid-flow-row sm:grid-rows-none sm:justify-items-stretch sm:gap-1">
             <button
               type="button"
               onClick={() => setChatOpen(true)}
@@ -1050,10 +1060,10 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
             <section
               className={`window-in absolute flex flex-col overflow-hidden bg-[#e6e6e6] shadow-[0_22px_40px_rgba(0,0,0,0.45),0_0_0_1px_rgba(0,0,0,0.45)] ${
                 maximized
-                  ? "inset-x-0 top-0 bottom-20 z-40"
+                  ? "inset-0 z-40"
                   : compact
-                    ? "top-10 right-[5rem] bottom-16 left-2 z-10"
-                    : "top-1.5 right-[6.4rem] bottom-11 left-2 z-10"
+                    ? "top-10 right-[5rem] bottom-2 left-2 z-10"
+                    : "top-1.5 right-[6.4rem] bottom-2 left-2 z-10"
               }`}
             >
               <div
@@ -1101,8 +1111,9 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
               />
             </section>
           ) : null}
+          </div>
 
-          <nav className="absolute right-2 bottom-1 left-2 z-30 flex items-center gap-0.5 overflow-x-auto rounded-full border border-white/50 bg-white/80 px-1.5 py-1 text-[11px] text-[#1c1a16] shadow-[0_10px_24px_rgba(0,0,0,0.28)] backdrop-blur-md sm:bottom-2 sm:px-2 sm:text-[12px]">
+          <nav className="grid shrink-0 grid-cols-7 gap-0.5 border-t border-white/15 bg-black/55 px-1 py-1 text-white backdrop-blur-md">
             {dockOrder.map((id) => (
               <button
                 key={id}
@@ -1114,21 +1125,23 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
                   }
                   openDesk(id);
                 }}
-                className={`min-h-9 cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap ${
-                  active === id ? "bg-white font-semibold shadow-sm" : "hover:bg-white/70"
+                className={`flex min-w-0 cursor-pointer flex-col items-center gap-0.5 rounded-md px-0.5 py-1 ${
+                  active === id ? "bg-white/20" : "hover:bg-white/10"
                 }`}
               >
-                {dockLabels[id]}
+                <DeskGlyph kind={dockGlyph[id]} className="size-5" />
+                <span className="w-full truncate text-center text-[9px] leading-none">{dockLabels[id]}</span>
               </button>
             ))}
             <button
               type="button"
               onClick={() => setChatOpen(true)}
-              className={`min-h-9 cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap ${
-                chatOpen ? "bg-white font-semibold shadow-sm" : "hover:bg-white/70"
+              className={`flex min-w-0 cursor-pointer flex-col items-center gap-0.5 rounded-md px-0.5 py-1 ${
+                chatOpen ? "bg-white/20" : "hover:bg-white/10"
               }`}
             >
-              Ask
+              <DeskGlyph kind="ai" className="size-5" />
+              <span className="w-full truncate text-center text-[9px] leading-none">Ask</span>
             </button>
           </nav>
         </div>
