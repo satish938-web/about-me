@@ -1023,7 +1023,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
 
         <div className="relative z-10 flex h-[calc(100%-1.75rem)] flex-col" onClick={() => setMenu(null)}>
           <div className="relative min-h-0 flex-1">
-          <div className="desk-icons absolute top-2 right-1 bottom-2 z-20 grid w-[11.2rem] grid-flow-col grid-rows-5 content-start justify-items-center gap-y-1 overflow-y-auto sm:right-3 sm:w-[5.6rem] sm:grid-flow-row sm:grid-rows-none sm:justify-items-stretch sm:gap-1">
+          <div className="desk-icons absolute top-2 right-1 bottom-2 z-20 grid w-[11.5rem] grid-cols-2 content-start justify-items-center gap-x-1 gap-y-2 overflow-y-auto sm:right-3 sm:w-[13rem]">
             <button
               type="button"
               onClick={() => setChatOpen(true)}
