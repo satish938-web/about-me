@@ -1,10 +1,11 @@
 "use client";
 
 import { IBM_Plex_Mono } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { openStudio } from "@/components/scene/scroll";
 import { TrackingPhoto } from "@/components/scene/tracking-photo";
+import { speakText, stopSpeaking } from "@/lib/speech";
 
 const mono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -19,7 +20,7 @@ const bootLines = [
 ];
 
 function row(label: string, value: string) {
-  const dots = ".".repeat(Math.max(2, 24 - label.length));
+  const dots = ".".repeat(Math.max(2, 12 - label.length));
   return `${label} ${dots} ${value}`;
 }
 
@@ -77,23 +78,7 @@ function firstName(name: string) {
 }
 
 function spokenLine(name: string, role: string, company: string) {
-  return `Hi, I am ${firstName(name)}. I am a ${role.toLowerCase()}, currently working at ${company}. I have 2 years of experience. Click the computer to see the detail of my projects.`;
-}
-
-function pickMaleVoice() {
-  const voices = window.speechSynthesis.getVoices();
-  const score = (voice: SpeechSynthesisVoice) => {
-    const label = voice.name.toLowerCase();
-    const lang = voice.lang.toLowerCase();
-    let value = 0;
-    if (lang.startsWith("en-in")) value += 6;
-    else if (lang.startsWith("en-gb")) value += 3;
-    else if (lang.startsWith("en")) value += 1;
-    if (/male|david|daniel|ravi|prabhat|george|mark|brian|alex/.test(label)) value += 5;
-    if (/female|zira|samantha|heera|veena|susan|victoria/.test(label)) value -= 8;
-    return value;
-  };
-  return voices.slice().sort((a, b) => score(b) - score(a))[0] ?? null;
+  return `Hi, I am ${firstName(name)}. I am a ${role.toLowerCase()} at ${company}, since July 2026. Click the computer to see the detail of my projects.`;
 }
 
 export function BootScreen({ name, role, company }: { name: string; role: string; company: string }) {
@@ -101,6 +86,7 @@ export function BootScreen({ name, role, company }: { name: string; role: string
   const [visible, setVisible] = useState(1);
   const [sessionLines, setSessionLines] = useState<string[]>([]);
   const [speaking, setSpeaking] = useState(false);
+  const speakRef = useRef<() => void>(() => {});
   const line = spokenLine(name, role, company);
 
   useEffect(() => {
@@ -154,8 +140,7 @@ export function BootScreen({ name, role, company }: { name: string; role: string
       return () => window.clearTimeout(timer);
     }
 
-    const synth = window.speechSynthesis;
-    let started = false;
+    let playing = false;
     let finished = false;
 
     const finish = () => {
@@ -166,39 +151,54 @@ export function BootScreen({ name, role, company }: { name: string; role: string
     };
 
     const speak = () => {
-      if (started || finished) return;
-      started = true;
-      const utterance = new SpeechSynthesisUtterance(line);
-      utterance.lang = "en-IN";
-      utterance.rate = 0.96;
-      utterance.pitch = 0.82;
-      utterance.voice = pickMaleVoice();
-      utterance.onstart = () => setSpeaking(true);
-      utterance.onend = finish;
-      utterance.onerror = (event) => {
-        if (event.error === "not-allowed" || event.error === "interrupted") {
-          started = false;
+      if (finished || playing) return;
+      playing = true;
+      let heard = false;
+      const giveUp = window.setTimeout(() => {
+        if (!heard && !finished) {
+          playing = false;
           setSpeaking(false);
-          return;
         }
-        finish();
-      };
-      synth.cancel();
-      synth.speak(utterance);
-      setSpeaking(true);
+      }, 1400);
+      speakText(line, {
+        rate: 0.96,
+        pitch: 0.82,
+        male: true,
+        onstart: () => {
+          heard = true;
+          window.clearTimeout(giveUp);
+          setSpeaking(true);
+        },
+        onend: () => {
+          window.clearTimeout(giveUp);
+          playing = false;
+          finish();
+        },
+        onerror: (error) => {
+          window.clearTimeout(giveUp);
+          playing = false;
+          setSpeaking(false);
+          if (error === "not-allowed" || error === "interrupted" || error === "canceled") return;
+          finish();
+        },
+      });
     };
 
-    const unlock = () => speak();
-    window.addEventListener("pointerdown", unlock, { once: true });
-    const ready = window.setTimeout(speak, 200);
-    const fallback = window.setTimeout(finish, 18000);
-    if (synth.getVoices().length === 0) synth.addEventListener("voiceschanged", speak, { once: true });
+    speakRef.current = speak;
+
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const ready = coarse ? 0 : window.setTimeout(speak, 300);
+    const fallback = window.setTimeout(finish, 24000);
+    const onVoices = () => {
+      if (!coarse && !playing && !finished) speak();
+    };
+    window.speechSynthesis?.addEventListener("voiceschanged", onVoices);
 
     return () => {
-      window.clearTimeout(ready);
+      if (ready) window.clearTimeout(ready);
       window.clearTimeout(fallback);
-      window.removeEventListener("pointerdown", unlock);
-      synth.cancel();
+      window.speechSynthesis?.removeEventListener("voiceschanged", onVoices);
+      stopSpeaking();
     };
   }, [line, stage]);
 
@@ -214,7 +214,7 @@ export function BootScreen({ name, role, company }: { name: string; role: string
       aria-label={`${name} studio boot`}
     >
       {stage === "boot" ? (
-        <div className={`${mono.className} relative mx-auto flex h-full max-w-3xl flex-col justify-center px-6 py-16`}>
+        <div className={`${mono.className} relative mx-auto flex h-full max-w-3xl flex-col justify-center overflow-y-auto px-4 py-16 sm:px-6`}>
           <div
             className="pointer-events-none absolute inset-0 opacity-30"
             style={{
@@ -222,7 +222,7 @@ export function BootScreen({ name, role, company }: { name: string; role: string
                 "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.35) 3px)",
             }}
           />
-          <div className="relative space-y-1 text-sm leading-6 sm:text-base">
+          <div className="relative space-y-1 text-[12px] leading-5 break-words sm:text-base sm:leading-6">
             {bootLines.slice(0, visible).map((item) => (
               <p key={item}>{item}</p>
             ))}
@@ -233,7 +233,11 @@ export function BootScreen({ name, role, company }: { name: string; role: string
           </p>
         </div>
       ) : (
-        <div className="flex h-full w-full flex-col items-center justify-center px-6 text-[#f6f3ec]">
+        <button
+          type="button"
+          onClick={() => speakRef.current()}
+          className="flex h-full w-full flex-col items-center justify-center overflow-y-auto px-5 pt-8 pb-20 text-[#f6f3ec]"
+        >
           <TrackingPhoto
             src="/profile.png"
             alt=""
@@ -243,14 +247,16 @@ export function BootScreen({ name, role, company }: { name: string; role: string
           <p className="mt-6 text-center text-lg font-semibold tracking-tight">{name}</p>
           <p className="mt-3 max-w-md text-center text-[15px] leading-6 text-[#f6f3ec]/85">{line}</p>
           {speaking ? null : (
-            <p className="mt-3 text-center text-[12px] text-[#f3e2b3]">Tap the screen if the voice does not start.</p>
+            <p className="mt-4 rounded-full bg-[#f3e2b3] px-4 py-2 text-[13px] font-medium text-[#1c1a16]">
+              Tap to hear the introduction
+            </p>
           )}
-        </div>
+        </button>
       )}
       <button
         type="button"
         onClick={() => setStage("exit")}
-        className="absolute right-4 bottom-4 cursor-pointer rounded-full bg-[#f3e2b3] px-4 py-2 text-[12px] font-medium text-[#1c1a16]"
+        className="absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] cursor-pointer rounded-full bg-[#f3e2b3] px-4 py-2 text-[12px] font-medium text-[#1c1a16]"
       >
         Skip
       </button>

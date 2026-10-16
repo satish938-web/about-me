@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal site and a local assistant. The browser talks to the Node API. Node talks to the Python service. Python talks to a model running on this machine through Ollama. No external AI API.
+Personal site and a local assistant. The browser calls `/api` on the site. Next forwards that to the Python service. Python talks to Groq, or to Ollama on this machine. Node is a local shortcut and is not required for the live site.
 
 ## Folders
 
@@ -24,9 +24,15 @@ npm run dev
 
 Site: http://localhost:3000
 
-Node API: http://127.0.0.1:4000/api/health
+Chat through the site: http://localhost:3000/api/health
 
 Python service: http://127.0.0.1:8000/docs
+
+## Live site
+
+Frontend on Vercel, root directory `frontend`, and turn on files outside that directory so `content/` is included. Set `PYTHON_SERVICE_URL` to the Python service URL.
+
+Python on Render from this repo root, using `render.yaml`. Set `GROQ_API_KEY` there. `https://*.vercel.app` is already allowed to call it. Add any custom domain in `CORS_ORIGINS`.
 
 ## Local model
 

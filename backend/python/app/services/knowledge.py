@@ -68,6 +68,7 @@ class Knowledge:
             f"Role: {profile['role']}",
             f"Location: {profile['location']}",
             f"Email: {profile['email']}",
+            f"Phone: {profile.get('phone') or 'none'}",
             f"Availability: {profile['availability']}",
             f"Summary: {profile['summary']}",
             "About:",
@@ -85,6 +86,24 @@ class Knowledge:
             for entry in education:
                 if isinstance(entry, dict):
                     lines.append(f"- {entry.get('degree')}, {entry.get('school')}. {entry.get('detail')}")
+        work = profile.get("work")
+        if isinstance(work, list) and work:
+            lines.append("Work:")
+            for entry in work:
+                if not isinstance(entry, dict):
+                    continue
+                lines.append(
+                    f"- {entry.get('role')} at {entry.get('company')}, {entry.get('place')} ({entry.get('dates')})"
+                )
+                duties = entry.get("points")
+                if isinstance(duties, list):
+                    for duty in duties:
+                        lines.append(f"  - {duty}")
+        achievements = profile.get("achievements")
+        if isinstance(achievements, list) and achievements:
+            lines.append("Achievements:")
+            for item in achievements:
+                lines.append(f"- {item}")
         lines.append("Links:")
         for link in links:
             if not isinstance(link, dict):

@@ -345,5 +345,215 @@
         "text": "After sign-in: applications, offers, and profile. A new file starts here, and sanction still stays with the lender."
       }
     ]
+  },
+  {
+    "title": "Travel N World",
+    "year": "2026",
+    "summary": "A travel platform for customers and partner agencies. Visitors browse packages, destinations, and agents, then send a trip enquiry. Agencies register on the agent desk. Staff sign in by role.",
+    "tags": [
+      "React",
+      "Redux Toolkit",
+      "Vite",
+      "Tailwind CSS",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "JWT",
+      "AWS S3",
+      "CDN"
+    ],
+    "features": [
+      "Public site and admin portal with login and permission-based access",
+      "Packages, destinations, itineraries, enquiries, and bookings",
+      "APIs for packages, destinations, bookings, and enquiry management",
+      "AWS S3 and CDN for media storage and faster content delivery"
+    ],
+    "sections": [
+      {
+        "label": "Public site",
+        "items": [
+          "Live at https://www.travelnworld.com/",
+          "Home, About, Agents, Packages, Destination, Blogs, and Contact",
+          "Plan my trip, explore packages, and a member form for name, company, mobile, email, and destination",
+          "A verified travel-partners row on the home page"
+        ]
+      },
+      {
+        "label": "Agents",
+        "items": [
+          "Registered partners such as Admire Holidays, with city, rating, and a send-inquiry button",
+          "Phone numbers on the card are masked",
+          "Grow your agency: verified badge, traveler reach, and a premium dashboard, then register as a partner"
+        ]
+      },
+      {
+        "label": "What it covers",
+        "items": [
+          "Package management, itineraries, enquiries, bookings, and customer operations",
+          "A public website for customers and a separate admin panel for staff"
+        ]
+      },
+      {
+        "label": "Access",
+        "items": [
+          "Secure authentication on both portals",
+          "Permission-based access so each role sees only its own work"
+        ]
+      },
+      {
+        "label": "Media",
+        "items": [
+          "Photos and files stored on AWS S3",
+          "CDN delivery so package media loads faster"
+        ]
+      }
+    ],
+    "href": "https://www.travelnworld.com/",
+    "shots": [
+      {
+        "src": "/projects/travel-n-world/home.png",
+        "title": "Home",
+        "text": "The public home page. Elite travel experience, explore packages, and a plan-my-trip form."
+      },
+      {
+        "src": "/projects/travel-n-world/partners.png",
+        "title": "Verified partners",
+        "text": "A row of verified travel partners, each with a city and a rating."
+      },
+      {
+        "src": "/projects/travel-n-world/agents.png",
+        "title": "Agents",
+        "text": "Registered agencies, including Admire Holidays in Delhi, with inquiry and partner registration."
+      },
+      {
+        "src": "/projects/travel-n-world/login.png",
+        "title": "Sign in",
+        "text": "Staff sign in with email, password, and a role such as Super Admin."
+      }
+    ]
+  },
+  {
+    "title": "CRM PRO",
+    "year": "2026",
+    "summary": "The staff desk for travel companies. One login covers leads, calls, bookings, attendance, and leave. Super Admin, Admin, and Employee each see a different desk.",
+    "tags": [
+      "React",
+      "Redux Toolkit",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "JWT",
+      "AWS S3"
+    ],
+    "features": [
+      "One desk for tasks, trip bookings, staff attendance, and the lead pipeline",
+      "Leads split into follow-up, interested, connected, and cancelled, with assign and transfer",
+      "Call activity and disposition charts",
+      "Leave review across companies: pending, approved, and rejected",
+      "Company directory and role assignment for Super Admin, Admin, and Employee"
+    ],
+    "sections": [
+      {
+        "label": "Dashboard",
+        "items": [
+          "Today's tasks, travel bookings, who is present, and how many leads are in the CRM",
+          "Weekly call activity and a breakdown of enquiry, connected, and interested calls"
+        ]
+      },
+      {
+        "label": "Leads",
+        "items": [
+          "My leads, assigned leads, leads by destination, and transfer to operations",
+          "A pipeline for hot, warm, cold, converted, and completed trips",
+          "Filter by company, including Admire Holidays and Travel N World"
+        ]
+      },
+      {
+        "label": "People",
+        "items": [
+          "Sign-in roles: Super Admin, Admin, and Employee",
+          "Assign modules and permissions per admin and company",
+          "Leave applications with company, type, dates, and status"
+        ]
+      }
+    ],
+    "shots": [
+      {
+        "src": "/projects/crm-pro/login.png",
+        "title": "Sign in",
+        "text": "CRM PRO login. The person picks Super Admin, Admin, or Employee, then opens the dashboard."
+      },
+      {
+        "src": "/projects/crm-pro/dashboard.png",
+        "title": "Dashboard",
+        "text": "Today's tasks, trip bookings, staff attendance, and the lead count on one overview."
+      },
+      {
+        "src": "/projects/crm-pro/calls.png",
+        "title": "Calls",
+        "text": "Weekly calling activity and a ring chart of enquiry, connected, and interested outcomes."
+      },
+      {
+        "src": "/projects/crm-pro/companies.png",
+        "title": "Companies",
+        "text": "Partner companies on one directory, including Admire Holidays and Travel N World."
+      },
+      {
+        "src": "/projects/crm-pro/roles.png",
+        "title": "Roles",
+        "text": "Assign modules and permissions to an admin, for one company at a time."
+      },
+      {
+        "src": "/projects/crm-pro/leaves.png",
+        "title": "Leave",
+        "text": "Leave requests across companies, with pending, approved, and rejected counts."
+      },
+      {
+        "src": "/projects/crm-pro/leads.png",
+        "title": "My leads",
+        "text": "A personal lead list: follow-up, interested, connected, and cancelled, plus add lead."
+      },
+      {
+        "src": "/projects/crm-pro/pipeline.png",
+        "title": "Lead pipeline",
+        "text": "All companies in one pipeline: hot, warm, cold, converted, and completed trips."
+      }
+    ]
+  },
+  {
+    "title": "Real-Time Chat",
+    "year": "2025",
+    "summary": "A real-time chat app on Socket.IO. People sign in, see who is online, type in group rooms, and watch typing indicators update live.",
+    "tags": [
+      "React",
+      "Redux Toolkit",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Socket.IO",
+      "JWT"
+    ],
+    "features": [
+      "Live messages over Socket.IO and WebSockets",
+      "JWT login",
+      "Typing indicators, group chats, and online status",
+      "Redux Toolkit for client state"
+    ],
+    "sections": [
+      {
+        "label": "Live",
+        "items": [
+          "Messages move through Socket.IO instead of a refresh",
+          "Typing indicators and online status update while the chat is open"
+        ]
+      },
+      {
+        "label": "Rooms",
+        "items": [
+          "Group chats as well as direct conversation",
+          "JWT keeps the session on the same account that owns the messages"
+        ]
+      }
+    ]
   }
 ]

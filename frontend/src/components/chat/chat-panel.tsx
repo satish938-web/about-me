@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useChat } from "@/components/chat/chat-provider";
 import { useScreen, type ScreenRect } from "@/components/scene/screen-context";
 import { apiUrl } from "@/lib/api";
+import { speakText, stopSpeaking } from "@/lib/speech";
 import type { AssistantHealth, ChatMessage } from "@/types/chat";
 
 function placeBeside(rect: ScreenRect, width: number, height: number) {
@@ -76,7 +77,7 @@ export function ChatPanel({ name }: { name: string }) {
         }
       } catch {
         if (!ignore) {
-          setHealth({ node: "down", ai: "down", ollama: "down", model: null });
+          setHealth({ ai: "down", ollama: "down", model: null });
         }
       }
     }
@@ -84,6 +85,7 @@ export function ChatPanel({ name }: { name: string }) {
     void loadHealth();
     return () => {
       ignore = true;
+      stopSpeaking();
     };
   }, [open]);
 
@@ -155,7 +157,7 @@ export function ChatPanel({ name }: { name: string }) {
         className={`pointer-events-auto flex flex-col bg-night text-cream ${
           beside
             ? "absolute border border-cream/15 shadow-2xl"
-            : "absolute inset-0 md:inset-auto md:right-8 md:bottom-20 md:h-[min(640px,calc(100%-6rem))] md:w-[400px] md:border md:border-cream/15"
+            : "absolute inset-0 h-dvh md:inset-auto md:right-8 md:bottom-20 md:h-[min(640px,calc(100%-6rem))] md:w-[400px] md:border md:border-cream/15"
         }`}
       >
         <header className="flex items-start justify-between gap-4 border-b border-cream/15 px-5 py-4">
@@ -182,7 +184,7 @@ export function ChatPanel({ name }: { name: string }) {
             </p>
           ) : null}
           {messages.map((message, index) => (
-            <p
+            <div
               key={`${message.role}-${index}`}
               className={
                 message.role === "user"
@@ -190,8 +192,17 @@ export function ChatPanel({ name }: { name: string }) {
                   : "mr-6 text-sm leading-relaxed text-cream/90"
               }
             >
-              {message.content}
-            </p>
+              <p>{message.content}</p>
+              {message.role === "assistant" ? (
+                <button
+                  type="button"
+                  onClick={() => speakText(message.content, { rate: 0.98, pitch: 0.9 })}
+                  className="mt-2 text-[11px] tracking-[0.14em] text-[#f3e2b3] uppercase"
+                >
+                  Play voice
+                </button>
+              ) : null}
+            </div>
           ))}
           {pending ? <p className="text-sm text-cream/60">Thinking…</p> : null}
           {error ? <p className="text-sm text-cream">{error}</p> : null}
@@ -199,7 +210,7 @@ export function ChatPanel({ name }: { name: string }) {
         </div>
 
         <form
-          className="border-t border-cream/15 p-4"
+          className="border-t border-cream/15 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
           onSubmit={(event) => {
             event.preventDefault();
             void send();
@@ -225,7 +236,7 @@ export function ChatPanel({ name }: { name: string }) {
             className="w-full resize-none bg-transparent text-sm leading-relaxed outline-none placeholder:text-cream/40"
           />
           <div className="mt-3 flex items-center justify-between gap-3">
-            <p className="text-xs tracking-[0.14em] text-cream/50 uppercase">
+            <p className="min-w-0 truncate text-xs tracking-[0.14em] text-cream/50 uppercase">
               {health?.model ?? "Model offline"}
             </p>
             <button
@@ -246,11 +257,8 @@ function statusLine(health: AssistantHealth | null): string {
   if (!health) {
     return "Checking the assistant…";
   }
-  if (health.node === "down") {
-    return "Node API is offline.";
-  }
-  if (health.ai === "down") {
-    return "Python service is offline.";
+  if (health.node === "down" || health.ai === "down") {
+    return "The assistant is offline.";
   }
   if (health.ollama === "down") {
     return "The model is offline. Answers need it to be reachable.";
@@ -263,8 +271,10 @@ function isHealth(value: unknown): value is AssistantHealth {
     return false;
   }
   const record = value as Record<string, unknown>;
+  const node = record.node;
+  const nodeOk = node === undefined || node === "ok" || node === "down";
   return (
-    (record.node === "ok" || record.node === "down") &&
+    nodeOk &&
     (record.ai === "ok" || record.ai === "down") &&
     (record.ollama === "ok" || record.ollama === "down") &&
     (typeof record.model === "string" || record.model === null)

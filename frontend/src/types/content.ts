@@ -9,16 +9,27 @@ export type Education = {
   detail: string;
 };
 
+export type Work = {
+  role: string;
+  company: string;
+  place: string;
+  dates: string;
+  points: string[];
+};
+
 export type Profile = {
   name: string;
   role: string;
   location: string;
   email: string;
+  phone?: string;
   availability: string;
   summary: string;
   about: string[];
   points?: string[];
   education?: Education[];
+  work?: Work[];
+  achievements?: string[];
   links: ProfileLink[];
 };
 

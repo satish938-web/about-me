@@ -16,6 +16,7 @@ app = FastAPI(title="Portfolio AI", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    allow_origin_regex=r"https://[\w.-]+\.vercel\.app",
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )

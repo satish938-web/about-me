@@ -7,7 +7,7 @@
   {
     "label": "Frontend",
     "detail": "Marketing sites, customer dashboards, and admin panels. Motion, charts, and forms included.",
-    "items": ["JavaScript", "TypeScript", "Vite", "React Router", "Redux Toolkit", "Tailwind CSS", "Ant Design", "Bootstrap", "Material UI", "Framer Motion", "GSAP", "Chart.js"]
+    "items": ["HTML", "CSS", "JavaScript", "TypeScript", "Vite", "React Router", "Redux Toolkit", "Tailwind CSS", "Ant Design", "Bootstrap", "Material UI", "Framer Motion", "GSAP", "Chart.js"]
   },
   {
     "label": "Backend",
@@ -27,11 +27,21 @@
   {
     "label": "Deploy",
     "detail": "The site, the admin, and the API each go out on their own host.",
-    "items": ["Vercel", "Railway", "Firebase", "MongoDB Atlas", "Docker"]
+    "items": ["Vercel", "Render", "Railway", "Firebase", "MongoDB Atlas", "Docker", "AWS S3", "CDN"]
+  },
+  {
+    "label": "Languages",
+    "detail": "The languages I write in, from the web stack back to C and Java.",
+    "items": ["JavaScript", "TypeScript", "Java", "C", "C++"]
+  },
+  {
+    "label": "Tools",
+    "detail": "Day-to-day tools for git, APIs, and the editor.",
+    "items": ["Git", "GitHub", "GitLab", "Postman", "VS Code", "Cursor"]
   },
   {
     "label": "Products",
     "detail": "HR and sales inside the company, the public loan site, and the MSME desk.",
-    "items": ["HRMS", "Sales CRM", "Loan website", "MSME desk", "SEO pages"]
+    "items": ["HRMS", "Sales CRM", "Loan website", "MSME desk", "Travel booking", "Real-time chat", "SEO pages"]
   }
 ]

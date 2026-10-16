@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { PortfolioContent, Profile, ProfileLink, Project, SkillGroup } from "@/types/content";
+import type { PortfolioContent, Profile, ProfileLink, Project, SkillGroup, Work } from "@/types/content";
 
 function contentDirectory(): string {
   if (process.env.CONTENT_DIR) {
@@ -63,6 +63,10 @@ function parseProfile(value: unknown): Profile {
     profile.points = asStringList(record.points, "profile.points");
   }
 
+  if (typeof record.phone === "string" && record.phone.trim() !== "") {
+    profile.phone = record.phone.trim();
+  }
+
   if (Array.isArray(record.education)) {
     profile.education = record.education.map((entry, index) => {
       const item = asRecord(entry, `profile.education[${index}]`);
@@ -74,7 +78,26 @@ function parseProfile(value: unknown): Profile {
     });
   }
 
+  if (Array.isArray(record.work)) {
+    profile.work = record.work.map((entry, index) => parseWork(entry, index));
+  }
+
+  if (Array.isArray(record.achievements)) {
+    profile.achievements = asStringList(record.achievements, "profile.achievements");
+  }
+
   return profile;
+}
+
+function parseWork(value: unknown, index: number): Work {
+  const item = asRecord(value, `profile.work[${index}]`);
+  return {
+    role: asString(item.role, `profile.work[${index}].role`),
+    company: asString(item.company, `profile.work[${index}].company`),
+    place: asString(item.place, `profile.work[${index}].place`),
+    dates: asString(item.dates, `profile.work[${index}].dates`),
+    points: asStringList(item.points, `profile.work[${index}].points`),
+  };
 }
 
 function parseLink(value: unknown, index: number): ProfileLink {

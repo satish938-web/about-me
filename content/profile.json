@@ -1,14 +1,16 @@
 {
   "name": "Satish Gupta",
-  "role": "Software engineer",
-  "location": "India",
+  "role": "Software developer",
+  "location": "Noida, Uttar Pradesh",
   "email": "satish202627@gmail.com",
+  "phone": "+91 6379467223",
   "availability": "Victory Financial Consulting Pvt. Ltd.",
-  "summary": "I am currently working at Victory Financial Consulting Pvt. Ltd. as a software engineer. I have 2 years of experience.",
+  "summary": "Since July 2026 I have been a software developer at Victory Financial Consulting Pvt. Ltd. I build the HRMS, the loan site, and VFC Rise. I also ship MERN products for travel, CRM, and real-time chat.",
   "about": [
     "I build the public website, the staff panel, and the API they share.",
     "The work is an HRMS and sales CRM, the loan site, and VFC Rise for MSME loans.",
-    "I completed a B.Tech from Bihar Engineering University (AKU). Mathematics and physics were my strongest subjects."
+    "I also build travel booking, enterprise CRM, and real-time chat on the MERN stack, with React, Node, Express, MongoDB, and Redux Toolkit.",
+    "I completed a B.Tech in Computer Science and Engineering from Bihar Engineering University, Patna. Mathematics and physics were my strongest subjects."
   ],
   "points": [
     "I ship the screen and the API together, so the customer page and the staff desk stay on the same data.",
@@ -19,10 +21,60 @@
   ],
   "education": [
     {
-      "degree": "B.Tech",
-      "school": "Bihar Engineering University (AKU)",
-      "detail": "Completed. Strongest subjects were mathematics and physics."
+      "degree": "B.Tech, Computer Science and Engineering",
+      "school": "Bihar Engineering University, Patna",
+      "detail": "2021–2025. Strongest subjects were mathematics and physics."
     }
+  ],
+  "work": [
+    {
+      "role": "Software Developer",
+      "company": "Victory Financial Consulting Pvt. Ltd.",
+      "place": "Noida",
+      "dates": "Jul 2026 – Present",
+      "points": [
+        "I build the public website, the staff panel, and the API they share.",
+        "The products are an HRMS and sales CRM, the loan site, and VFC Rise for MSME loans."
+      ]
+    },
+    {
+      "role": "Full Stack Engineer (MERN Stack)",
+      "company": "Admire Holidays",
+      "place": "Delhi",
+      "dates": "Dec 2025 – Jul 2026",
+      "points": [
+        "I develop and maintain travel and CRM platforms with React.js, Node.js, Express.js, MongoDB, Redux Toolkit, and Tailwind CSS.",
+        "I build REST APIs, authentication, role-based access control, and cloud storage.",
+        "I integrate AWS S3, CDN delivery, Google OAuth, and JWT.",
+        "I work with business teams to automate workflows and improve the customer experience."
+      ]
+    },
+    {
+      "role": "Software Developer Intern (MERN Stack)",
+      "company": "Webapphealing Technology",
+      "place": "Noida",
+      "dates": "Oct 2025 – Dec 2025",
+      "points": [
+        "I built responsive frontends with React.js, Next.js, TypeScript, and Tailwind CSS.",
+        "I built backend APIs with Node.js and Express.js.",
+        "I implemented Socket.IO, JWT authentication, and third-party API integrations."
+      ]
+    },
+    {
+      "role": "Software Development Trainee (MERN Stack)",
+      "company": "QSpiders",
+      "place": "Noida",
+      "dates": "Jun 2025 – Oct 2025",
+      "points": [
+        "I completed intensive training in the MERN stack, REST APIs, database design, SDLC, and deployment.",
+        "I solved 300+ data structures and algorithms problems on LeetCode."
+      ]
+    }
+  ],
+  "achievements": [
+    "Solved 300+ data structures and algorithms problems on LeetCode.",
+    "Built and deployed multiple full-stack MERN applications.",
+    "Participated in coding contests, technical workshops, and mock interviews."
   ],
   "links": [
     { "label": "LinkedIn", "href": "https://www.linkedin.com/in/satish-gupta-4a3ab622b/" },

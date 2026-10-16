@@ -5,10 +5,11 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useChat } from "@/components/chat/chat-provider";
 import { TrackingPhoto } from "@/components/scene/tracking-photo";
 import { useScreen, type ScreenRect } from "@/components/scene/screen-context";
+import { speakText, stopSpeaking } from "@/lib/speech";
 import type { PortfolioContent } from "@/types/content";
 
 type DeskId = "about" | "projects" | "skills" | "photos" | "contact" | "sitemap" | "now" | "drive" | "trash";
-type Glyph = "folder" | "doc" | "disk" | "mail" | "trash" | "photo";
+type Glyph = "folder" | "doc" | "disk" | "mail" | "trash" | "photo" | "ai";
 type MenuId = "file" | "edit" | "special" | "help";
 
 type DeskItem = {
@@ -74,28 +75,7 @@ function formatClock(date: Date) {
 }
 
 function speakWelcome(name: string) {
-  const synth = window.speechSynthesis;
-  if (!synth) return;
-
-  const say = () => {
-    const utterance = new SpeechSynthesisUtterance(`Welcome to ${name}'s profile`);
-    utterance.lang = "en-IN";
-    utterance.rate = 0.95;
-    const voices = synth.getVoices();
-    utterance.voice =
-      voices.find((voice) => voice.lang.toLowerCase().startsWith("en-in")) ??
-      voices.find((voice) => voice.lang.toLowerCase().startsWith("en")) ??
-      null;
-    synth.cancel();
-    synth.speak(utterance);
-  };
-
-  if (synth.getVoices().length > 0) {
-    say();
-    return;
-  }
-
-  synth.addEventListener("voiceschanged", say, { once: true });
+  speakText(`Welcome to ${name}'s profile`, { rate: 0.95, pitch: 1 });
 }
 
 function DeskGlyph({ kind, className = "size-5" }: { kind: Glyph; className?: string }) {
@@ -133,6 +113,15 @@ function DeskGlyph({ kind, className = "size-5" }: { kind: Glyph; className?: st
       </svg>
     );
   }
+  if (kind === "ai") {
+    return (
+      <svg viewBox="0 0 32 32" className={`${className} drop-shadow`} aria-hidden="true">
+        <rect x="4" y="6" width="24" height="16" rx="4" fill="#e07a3d" />
+        <path d="M12 22.5 10 27l6-4.5" fill="#e07a3d" />
+        <path d="M11 14h10M11 18h6" stroke="#1c1612" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    );
+  }
   if (kind === "photo") {
     return (
       <svg viewBox="0 0 32 32" className={`${className} drop-shadow`} aria-hidden="true">
@@ -153,6 +142,16 @@ function DeskGlyph({ kind, className = "size-5" }: { kind: Glyph; className?: st
 
 function ContactMark({ href }: { href: string }) {
   const host = href.toLowerCase();
+  if (host.startsWith("tel:")) {
+    return (
+      <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
+        <path
+          fill="#12382c"
+          d="M8.2 3.5h2.2l1.2 3.1-1.6 1a12 12 0 0 0 5.4 5.4l1-1.6 3.1 1.2v2.2c0 .8-.6 1.5-1.4 1.6A14.2 14.2 0 0 1 6.6 4.9c.1-.8.8-1.4 1.6-1.4Z"
+        />
+      </svg>
+    );
+  }
   if (host.startsWith("mailto:") || host.includes("@")) {
     return (
       <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
@@ -187,6 +186,60 @@ function ContactMark({ href }: { href: string }) {
   );
 }
 
+function NowNote({
+  profile,
+  projects,
+}: {
+  profile: PortfolioContent["profile"];
+  projects: PortfolioContent["projects"];
+}) {
+  const school = profile.education?.[0];
+  const blocks: { title: string; body: string }[] = [
+    { title: "Now", body: `${profile.role}. ${profile.location}. ${profile.summary}` },
+    { title: "Company", body: profile.availability },
+    ...profile.about.map((body, index) => ({ title: index === 0 ? "Work" : "", body })),
+    ...(profile.work ?? []).map((job) => ({
+      title: job.company,
+      body: `${job.role}, ${job.place}. ${job.dates}. ${job.points[0] ?? ""}`,
+    })),
+    ...projects.map((project) => ({
+      title: project.title,
+      body: `${project.year}. ${project.summary}`,
+    })),
+    ...(profile.achievements ?? []).map((body, index) => ({ title: index === 0 ? "Done" : "", body })),
+    ...(profile.points ?? []).map((body) => ({ title: "", body })),
+    ...(school ? [{ title: "Study", body: `${school.degree}, ${school.school}. ${school.detail}` }] : []),
+    { title: "Write", body: profile.email },
+  ];
+
+  return (
+    <div
+      className="paper-scroll min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-16 text-[13px] leading-[1.45rem] text-[#1c1a16]"
+      style={{
+        backgroundColor: "#f7f6ef",
+        backgroundImage:
+          "linear-gradient(to right, transparent 0.85rem, rgba(120,160,210,0.9) 0.85rem, rgba(120,160,210,0.9) calc(0.85rem + 1px), transparent calc(0.85rem + 1px)), repeating-linear-gradient(to bottom, transparent 0, transparent 1.45rem, rgba(150,170,200,0.4) 1.45rem, rgba(150,170,200,0.4) calc(1.45rem + 1px))",
+        backgroundAttachment: "local",
+      }}
+    >
+      <div className="pl-4">
+        <p className="note-line text-[15px] font-semibold" style={{ animationDelay: "40ms" }}>
+          {profile.name}
+          <span className="note-caret ml-1 inline-block h-4 w-px translate-y-0.5 bg-[#1d5c45]" />
+        </p>
+        {blocks.map((block, index) => (
+          <div key={`${block.title}-${block.body}`} className="note-line mt-3" style={{ animationDelay: `${120 + index * 70}ms` }}>
+            {block.title ? (
+              <p className="text-[10px] font-semibold tracking-[0.16em] text-[#1d5c45] uppercase">{block.title}</p>
+            ) : null}
+            <p className="border-l-2 border-[#c4a15a] pl-2">{block.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Paper({ children }: { children: ReactNode }) {
   return (
     <div
@@ -211,7 +264,7 @@ function ProjectFolders({
   onOpen: (title: string) => void;
 }) {
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-3 content-start gap-2 overflow-y-auto bg-[#ececec] p-3">
+    <div className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2 overflow-y-auto bg-[#ececec] p-3 min-[480px]:grid-cols-3">
       {projects.map((project) => (
         <button
           key={project.title}
@@ -227,19 +280,14 @@ function ProjectFolders({
   );
 }
 
+function siteHost(href: string) {
+  return href.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
 function ProjectShots({ shots }: { shots: NonNullable<PortfolioContent["projects"][number]["shots"]> }) {
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const count = shots.length;
   const shot = shots[index] ?? shots[0];
-
-  useEffect(() => {
-    if (paused || count < 2) return;
-    const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % count);
-    }, 4600);
-    return () => window.clearInterval(timer);
-  }, [paused, count]);
 
   if (!shot) return null;
 
@@ -248,68 +296,69 @@ function ProjectShots({ shots }: { shots: NonNullable<PortfolioContent["projects
   };
 
   return (
-    <div
-      className="bg-[#0e1c17] text-[#f6f3ec]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="relative h-40 overflow-hidden bg-[#071410] sm:h-52">
-        {shots.map((item, itemIndex) => (
+    <div className="px-3 pt-3">
+      <div className="overflow-hidden rounded-xl border border-[#1d5c45]/15 bg-white shadow-[0_10px_24px_rgba(18,56,44,0.08)]">
+        <div className="flex items-center gap-1.5 border-b border-[#1d5c45]/10 bg-[#f6f3ec] px-3 py-2">
+          <span className="size-2 rounded-full bg-[#e7c3b0]" />
+          <span className="size-2 rounded-full bg-[#f3e2b3]" />
+          <span className="size-2 rounded-full bg-[#b7d7c8]" />
+          <p className="ml-2 truncate text-[10px] tracking-wide text-[#5d6b63]">{shot.title}</p>
+        </div>
+        <div className="relative bg-[#f3efe6]">
           <img
-            key={item.src}
-            src={item.src}
-            alt={item.title}
-            className={`absolute inset-0 h-full w-full object-contain object-top transition-all duration-700 ease-out ${
-              itemIndex === index ? "scale-100 opacity-100" : "pointer-events-none scale-[1.04] opacity-0"
-            }`}
+            key={shot.src}
+            src={shot.src}
+            alt={shot.title}
+            className="photo-in mx-auto max-h-72 w-full object-contain object-top"
           />
-        ))}
-        <button
-          type="button"
-          aria-label="Previous screen"
-          onClick={() => go(-1)}
-          className="absolute top-1/2 left-1.5 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-black/45 px-2 py-1 text-[12px] text-white"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          aria-label="Next screen"
-          onClick={() => go(1)}
-          className="absolute top-1/2 right-1.5 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-black/45 px-2 py-1 text-[12px] text-white"
-        >
-          ›
-        </button>
-      </div>
-      <div className="px-3 pt-2 pb-2.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <p key={shot.src} className="shot-caption text-[12px] font-semibold">
-            {shot.title}
-          </p>
-          <p className="shrink-0 text-[10px] text-[#d7f5e4]/70">
+        </div>
+        <div className="flex items-start justify-between gap-3 px-3 py-2.5">
+          <div className="min-w-0">
+            <p className="text-[12px] font-semibold text-[#12382c]">{shot.title}</p>
+            <p className="mt-0.5 text-[11px] leading-4 text-[#3f3f3f]">{shot.text}</p>
+          </div>
+          <p className="shrink-0 text-[10px] tracking-wide text-[#8a6a24]">
             {index + 1} / {count}
           </p>
         </div>
-        <p key={`${shot.src}-text`} className="shot-caption mt-0.5 text-[11px] leading-4 text-[#d7f5e4]/90">
-          {shot.text}
-        </p>
-        <div className="mt-2 h-0.5 overflow-hidden rounded-full bg-white/15">
-          <div key={`${index}-${paused}`} className={paused ? "h-full w-full bg-[#f3e2b3]" : "shot-progress h-full bg-[#f3e2b3]"} />
-        </div>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {shots.map((item, itemIndex) => (
-            <button
-              key={item.src}
-              type="button"
-              aria-label={item.title}
-              onClick={() => setIndex(itemIndex)}
-              className={`h-1.5 cursor-pointer rounded-full transition-all ${
-                itemIndex === index ? "w-4 bg-[#f3e2b3]" : "w-1.5 bg-white/35"
-              }`}
-            />
-          ))}
-        </div>
       </div>
+      {count > 1 ? (
+        <div className="mt-2 flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Previous screen"
+            onClick={() => go(-1)}
+            className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-lg border border-[#1d5c45]/15 bg-white text-[#12382c]"
+          >
+            ‹
+          </button>
+          <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto">
+            {shots.map((item, itemIndex) => {
+              const selected = itemIndex === index;
+              return (
+                <button
+                  key={item.src}
+                  type="button"
+                  onClick={() => setIndex(itemIndex)}
+                  aria-label={item.title}
+                  aria-current={selected ? "true" : undefined}
+                  className={`shrink-0 overflow-hidden rounded-md ring-2 ${selected ? "ring-[#1d5c45]" : "ring-transparent opacity-70"}`}
+                >
+                  <img src={item.src} alt="" className="h-10 w-14 object-cover object-top" />
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            aria-label="Next screen"
+            onClick={() => go(1)}
+            className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-lg border border-[#1d5c45]/15 bg-white text-[#12382c]"
+          >
+            ›
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -322,68 +371,123 @@ function ProjectDetail({
   onBack: () => void;
 }) {
   return (
-    <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f6f3ec] text-[#1c1a16]">
-      <button
-        type="button"
-        onClick={onBack}
-        className="sticky top-0 z-10 cursor-pointer border-b border-white/10 bg-[#10261e] px-3 py-1.5 text-left text-[11px] text-[#d7f5e4]"
-      >
-        ← Projects
-      </button>
-      <div className="bg-[linear-gradient(135deg,#12382c_0%,#1d5c45_55%,#c4a15a_140%)] px-4 py-4 text-[#f6f3ec]">
-        <h2 className="text-xl leading-tight font-semibold tracking-tight">{project.title}</h2>
-        <p className="mt-2 max-w-xl text-[12px] leading-5 text-[#f6f3ec]/85">{project.summary}</p>
+    <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f6f3ec] pb-6 text-[#1c1a16]">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#1d5c45]/10 bg-[#f6f3ec]/95 px-3 py-2 backdrop-blur-sm">
+        <button type="button" onClick={onBack} className="cursor-pointer text-[11px] font-medium text-[#1d5c45]">
+          ← Projects
+        </button>
+        <p className="text-[10px] tracking-[0.16em] text-[#8a6a24] uppercase">{project.year}</p>
+      </div>
+      <div className="px-4 pt-4">
+        <h2 className="text-[1.35rem] leading-tight font-semibold tracking-tight text-[#12382c]">{project.title}</h2>
+        <p className="mt-2 max-w-xl text-[13px] leading-5 text-[#3f3f3f]">{project.summary}</p>
         {project.href ? (
           <a
             href={project.href}
             target="_blank"
             rel="noreferrer"
-            className="mt-3 inline-block rounded-full bg-[#f3e2b3] px-3 py-1 text-[11px] font-medium text-[#1c1a16]"
+            className="mt-3 inline-flex max-w-full items-center gap-2 rounded-lg bg-[#12382c] px-3 py-2 text-[12px] font-semibold text-white"
           >
-            {project.href}
+            Visit site
+            <span className="truncate font-normal text-white/75">{siteHost(project.href)}</span>
           </a>
         ) : null}
       </div>
       {project.shots?.length ? (
         <ProjectShots shots={project.shots} />
       ) : project.image ? (
-        <img src={project.image} alt="" className="max-h-64 w-full bg-[#111] object-contain" />
+        <img src={project.image} alt="" className="mx-3 mt-3 max-h-72 w-[calc(100%-1.5rem)] rounded-xl bg-white object-contain" />
       ) : null}
       <div className="space-y-3 px-3 py-3">
-        <ul className="grid gap-1.5">
-          {project.features.map((feature) => (
-            <li key={feature} className="rounded-md border border-[#1d5c45]/15 bg-white px-2.5 py-1.5 text-[12px] leading-4">
-              {feature}
-            </li>
-          ))}
-        </ul>
-        <div>
-          <h3 className="text-[10px] tracking-[0.18em] text-[#5d6b63] uppercase">Tech stack</h3>
-          <ul className="mt-1.5 flex flex-wrap gap-1.5">
+        <section className="rounded-xl border border-[#1d5c45]/15 bg-white p-3">
+          <h3 className="text-[10px] font-semibold tracking-[0.16em] text-[#1d5c45] uppercase">Highlights</h3>
+          <ul className="mt-2 space-y-2">
+            {project.features.map((feature) => (
+              <li key={feature} className="flex gap-2 text-[12px] leading-4">
+                <span className="mt-0.5 text-[#1d5c45]">✓</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section className="rounded-xl border border-[#1d5c45]/15 bg-white p-3">
+          <h3 className="text-[10px] font-semibold tracking-[0.16em] text-[#1d5c45] uppercase">Stack</h3>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
             {project.tags.map((tag) => (
-              <li key={tag} className="rounded-full bg-[#12382c] px-2 py-0.5 text-[10px] text-[#e7f6ee]">
+              <li key={tag} className="rounded-md border border-[#1d5c45]/15 bg-[#f6f3ec] px-2 py-0.5 text-[10px] text-[#12382c]">
                 {tag}
               </li>
             ))}
           </ul>
-        </div>
-        {project.sections?.map((section, index) => (
-          <section
-            key={section.label}
-            className={`rounded-lg border bg-white p-3 ${index % 2 === 0 ? "border-[#1d5c45]/25" : "border-[#c4a15a]/50"}`}
-          >
-            <h3 className={`text-[11px] font-semibold tracking-[0.14em] uppercase ${index % 2 === 0 ? "text-[#1d5c45]" : "text-[#8a6a24]"}`}>
-              {section.label}
-            </h3>
-            <ul className="mt-2 space-y-1 text-[12px] leading-4">
+        </section>
+        {project.sections?.map((section) => (
+          <section key={section.label} className="rounded-xl border border-[#1d5c45]/15 bg-white p-3">
+            <h3 className="text-[10px] font-semibold tracking-[0.16em] text-[#1d5c45] uppercase">{section.label}</h3>
+            <ul className="mt-2 space-y-1.5 text-[12px] leading-4">
               {section.items.map((item) => (
-                <li key={item} className="flex gap-2">
-                  <span className={`mt-1 size-1.5 shrink-0 rounded-full ${index % 2 === 0 ? "bg-[#1d5c45]" : "bg-[#c4a15a]"}`} />
-                  <span>{item}</span>
+                <li key={item} className="border-l-2 border-[#c4a15a] pl-2">
+                  {item}
                 </li>
               ))}
             </ul>
           </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const album = [
+  { src: "/profile.png", label: "Portrait" },
+  { src: "/photos/lab.png", label: "Computer lab" },
+  { src: "/photos/lab-2.png", label: "Project day" },
+  { src: "/photos/group.png", label: "With the batch" },
+  { src: "/photos/bench.png", label: "Campus" },
+];
+
+function PhotoAlbum({ name }: { name: string }) {
+  const [index, setIndex] = useState<number | null>(null);
+  const shot = index === null ? null : album[index];
+
+  if (shot && index !== null) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col bg-[#141210]">
+        <div className="flex items-center gap-2 px-3 pt-3">
+          <button
+            type="button"
+            onClick={() => setIndex(null)}
+            className="rounded-full bg-white/10 px-3 py-1 text-[11px] text-white/90 hover:bg-white/20"
+          >
+            ← Photos
+          </button>
+          <p className="min-w-0 truncate text-[11px] tracking-wide text-white/75">{shot.label}</p>
+        </div>
+        <div className="flex min-h-0 flex-1 items-center justify-center px-3 pt-3 pb-4">
+          <img
+            key={shot.src}
+            src={shot.src}
+            alt={`${name}, ${shot.label}`}
+            className="photo-in max-h-full w-auto max-w-full rounded-xl object-contain shadow-[0_16px_36px_rgba(0,0,0,0.45)] ring-1 ring-white/15"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto bg-[#141210] px-3 py-3 pb-6">
+      <div className="grid grid-cols-3 gap-2">
+        {album.map((item, itemIndex) => (
+          <button
+            key={item.src}
+            type="button"
+            onClick={() => setIndex(itemIndex)}
+            className="photo-in overflow-hidden rounded-xl bg-white/5 text-left ring-1 ring-white/10 transition hover:ring-[#f3d56b]"
+            style={{ animationDelay: `${itemIndex * 60}ms` }}
+          >
+            <img src={item.src} alt="" className="aspect-[3/4] w-full object-cover" />
+            <span className="block truncate px-2 py-1.5 text-[11px] text-white/80">{item.label}</span>
+          </button>
         ))}
       </div>
     </div>
@@ -409,8 +513,7 @@ function WindowBody({
 
   if (id === "about") {
     const facts = [
-      { value: "Now", label: "at VFC" },
-      { value: "B.Tech", label: "AKU" },
+      { value: "300+", label: "LeetCode" },
       { value: String(projects.length), label: projects.length === 1 ? "product" : "products" },
     ];
 
@@ -432,7 +535,7 @@ function WindowBody({
           </div>
           <p className="mt-3 text-[12px] leading-5 text-[#f6f3ec]/90">{profile.summary}</p>
         </div>
-        <div className="grid grid-cols-3 gap-2 px-3 pt-3">
+        <div className="grid grid-cols-2 gap-2 px-3 pt-3">
           {facts.map((fact) => (
             <div key={fact.label} className="rounded-xl border border-[#1d5c45]/15 bg-white px-2 py-2 text-center shadow-[0_8px_18px_rgba(18,56,44,0.08)]">
               <p className="text-[15px] font-semibold tracking-tight text-[#12382c]">{fact.value}</p>
@@ -464,7 +567,7 @@ function WindowBody({
                   <p className="text-[12px] leading-4 text-[#3f3f3f]">{entry.school}</p>
                   <p className="mt-2 text-[12px] leading-4">{entry.detail}</p>
                   <ul className="mt-2 flex flex-wrap gap-1.5">
-                    {["Mathematics", "Physics"].map((subject) => (
+                    {["Computer Science", "Mathematics", "Physics"].map((subject) => (
                       <li key={subject} className="rounded-full bg-[#f3e2b3] px-2 py-0.5 text-[10px] font-medium text-[#5c4814]">
                         {subject}
                       </li>
@@ -474,6 +577,41 @@ function WindowBody({
               </div>
             </section>
           ))}
+          {(profile.work ?? []).length > 0 ? (
+            <section className="rounded-xl border border-[#1d5c45]/20 bg-white p-3">
+              <h3 className="text-[10px] tracking-[0.18em] text-[#1d5c45] uppercase">Experience</h3>
+              <ol className="mt-2 space-y-3">
+                {profile.work?.map((job) => (
+                  <li key={`${job.company}-${job.dates}`}>
+                    <p className="text-[13px] font-semibold leading-4">{job.role}</p>
+                    <p className="text-[12px] text-[#3f3f3f]">
+                      {job.company}, {job.place}
+                    </p>
+                    <p className="text-[11px] text-[#8a6a24]">{job.dates}</p>
+                    <ul className="mt-1.5 space-y-1">
+                      {job.points.map((point) => (
+                        <li key={point} className="text-[12px] leading-4">
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+          {(profile.achievements ?? []).length > 0 ? (
+            <section className="rounded-xl border border-[#c4a15a]/40 bg-white p-3">
+              <h3 className="text-[10px] tracking-[0.18em] text-[#8a6a24] uppercase">Achievements</h3>
+              <ul className="mt-2 space-y-1.5">
+                {profile.achievements?.map((item) => (
+                  <li key={item} className="text-[12px] leading-4">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
           <section className="rounded-xl border border-[#1d5c45]/20 bg-white p-3">
             <h3 className="text-[10px] tracking-[0.18em] text-[#1d5c45] uppercase">What I build</h3>
             <ul className="mt-2 space-y-1.5">
@@ -508,54 +646,58 @@ function WindowBody({
   }
 
   if (id === "skills") {
+    const tones = [
+      { card: "border-sky-200 bg-sky-50", title: "text-sky-800", pill: "bg-sky-600 text-white" },
+      { card: "border-violet-200 bg-violet-50", title: "text-violet-800", pill: "bg-violet-600 text-white" },
+      { card: "border-emerald-200 bg-emerald-50", title: "text-emerald-800", pill: "bg-emerald-600 text-white" },
+      { card: "border-amber-200 bg-amber-50", title: "text-amber-800", pill: "bg-amber-500 text-[#1c1a16]" },
+      { card: "border-rose-200 bg-rose-50", title: "text-rose-800", pill: "bg-rose-600 text-white" },
+      { card: "border-indigo-200 bg-indigo-50", title: "text-indigo-800", pill: "bg-indigo-600 text-white" },
+    ];
     return (
-      <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f6f3ec] text-[#1c1a16]">
-        <div className="bg-[linear-gradient(135deg,#12382c_0%,#1d5c45_55%,#c4a15a_140%)] px-4 py-4 text-[#f6f3ec]">
-          <p className="text-[10px] tracking-[0.2em] text-[#f3e2b3] uppercase">All-rounder</p>
+      <div className="paper-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f3f0ff] pb-16 text-[#1c1a16]">
+        <div className="bg-[linear-gradient(135deg,#4c1d95_0%,#0369a1_55%,#ea580c_130%)] px-4 py-4 text-white">
+          <p className="text-[10px] tracking-[0.2em] text-amber-200 uppercase">All-rounder</p>
           <h2 className="mt-1 text-xl leading-tight font-semibold tracking-tight">Full product, one engineer</h2>
-          <p className="mt-2 max-w-xl text-[12px] leading-5 text-[#f6f3ec]/85">
-            Public site, staff desk, API, calls, and AI assistants. Currently a software engineer at Victory Financial Consulting.
+          <p className="mt-2 max-w-xl text-[12px] leading-5 text-white/85">
+            Public site, staff desk, API, calls, and AI assistants. MERN travel, CRM, and chat sit alongside the VFC products.
           </p>
         </div>
         <div className="space-y-2 px-3 py-3">
-          {skills.map((group, index) => (
-            <section
-              key={group.label}
-              className={`rounded-lg border bg-white p-3 ${index % 2 === 0 ? "border-[#1d5c45]/25" : "border-[#c4a15a]/50"}`}
-            >
-              <h3 className={`text-[11px] font-semibold tracking-[0.14em] uppercase ${index % 2 === 0 ? "text-[#1d5c45]" : "text-[#8a6a24]"}`}>
-                {group.label}
-              </h3>
-              {group.detail ? <p className="mt-1.5 text-[12px] leading-4">{group.detail}</p> : null}
-              <ul className="mt-2 flex flex-wrap gap-1.5">
-                {group.items.map((item) => (
-                  <li key={item} className="rounded-full bg-[#12382c] px-2 py-0.5 text-[10px] text-[#e7f6ee]">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+          {skills.map((group, index) => {
+            const tone = tones[index % tones.length];
+            return (
+              <section
+                key={group.label}
+                className={`note-line rounded-lg border p-3 ${tone.card}`}
+                style={{ animationDelay: `${index * 70}ms` }}
+              >
+                <h3 className={`text-[11px] font-semibold tracking-[0.14em] uppercase ${tone.title}`}>{group.label}</h3>
+                {group.detail ? <p className="mt-1.5 text-[12px] leading-4">{group.detail}</p> : null}
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {group.items.map((item) => (
+                    <li key={item} className={`rounded-full px-2 py-0.5 text-[10px] ${tone.pill}`}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
         </div>
       </div>
     );
   }
 
   if (id === "photos") {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-[#161616] p-4">
-        <TrackingPhoto
-          src="/profile.png"
-          alt={profile.name}
-          className="aspect-[3/4] h-[min(100%,26rem)] max-w-full shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
-        />
-        <p className="mt-2 text-[11px] text-white/75">{profile.name}</p>
-      </div>
-    );
+    return <PhotoAlbum name={profile.name} />;
   }
 
   if (id === "contact") {
     const rows = [
+      ...(profile.phone
+        ? [{ label: "Phone", href: `tel:${profile.phone.replace(/[^\d+]/g, "")}`, text: profile.phone }]
+        : []),
       { label: "Email", href: `mailto:${profile.email}`, text: profile.email },
       ...profile.links.map((link) => ({ label: link.label, href: link.href, text: link.href.replace(/^https?:\/\//, "") })),
     ];
@@ -618,14 +760,7 @@ function WindowBody({
   }
 
   if (id === "now") {
-    return (
-      <Paper>
-        <p>{profile.availability}</p>
-        <p>
-          {profile.location}. {profile.summary}
-        </p>
-      </Paper>
-    );
+    return <NowNote profile={profile} projects={projects} />;
   }
 
   if (id === "drive") {
@@ -660,19 +795,28 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
     { id: "now", label: "Now.txt", kind: "doc" },
   ];
   const [active, setActive] = useState<DeskId | null>(null);
+  const [maximized, setMaximized] = useState(true);
+  const [minimized, setMinimized] = useState(false);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
   const [menu, setMenu] = useState<MenuId | null>(null);
-  const [sound, setSound] = useState(false);
+  const [sound, setSound] = useState(true);
   const [clock, setClock] = useState("");
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const soundRef = useRef(sound);
   soundRef.current = sound;
 
   useEffect(() => {
-    const measure = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
+    const measure = () => {
+      const view = window.visualViewport;
+      setViewport({ width: view?.width ?? window.innerWidth, height: view?.height ?? window.innerHeight });
+    };
     measure();
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    window.visualViewport?.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.visualViewport?.removeEventListener("resize", measure);
+    };
   }, []);
 
   useEffect(() => {
@@ -685,7 +829,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
   useEffect(() => {
     document.body.classList.toggle("screen-open", open);
     if (!open) {
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
       return;
     }
 
@@ -703,13 +847,15 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
     return () => {
       document.body.style.overflow = previous;
       window.removeEventListener("keydown", onKey);
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
     };
   }, [open, setOpen, first]);
 
   useEffect(() => {
     if (!open) {
       setActive(null);
+      setMaximized(true);
+      setMinimized(false);
       setProjectTitle(null);
       setMenu(null);
     }
@@ -719,7 +865,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
     setSound((value) => {
       const next = !value;
       if (next) speakWelcome(first);
-      else window.speechSynthesis?.cancel();
+      else stopSpeaking();
       return next;
     });
   }
@@ -737,6 +883,8 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
 
   function openDesk(id: DeskId) {
     setProjectTitle(null);
+    setMinimized(false);
+    setMaximized(true);
     setActive(id);
   }
 
@@ -746,6 +894,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
       return;
     }
     setActive(null);
+    setMinimized(false);
   }
 
   return (
@@ -780,26 +929,19 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,#241433_0%,#6d3a55_34%,#e08a62_62%,#2a1838_100%)]" />
-          <div className="absolute top-[10%] left-[6%] h-[42%] w-[28%] bg-[linear-gradient(180deg,#ffc49a,#7d4f86)] shadow-[0_0_50px_rgba(255,170,110,0.45)]" />
-          <div className="absolute top-[20%] left-[38%] h-[32%] w-[26%] rounded-sm bg-[#120c18]/75 shadow-[0_0_30px_rgba(120,220,160,0.18)]" />
           <div className="absolute right-0 bottom-0 left-0 h-[34%] bg-[linear-gradient(180deg,transparent,#140e1c)]" />
         </div>
 
-        <div className="relative z-20 flex h-7 items-center justify-between gap-2 px-2 text-[11px] [text-shadow:0_1px_2px_rgba(0,0,0,0.65)]">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            {compact ? (
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="cursor-pointer rounded bg-white/90 px-1.5 py-0.5 text-[10px] text-[#1c1a16] [text-shadow:none]"
-              >
-                ← Desk
-              </button>
-            ) : (
-              <span className="grid size-4 place-items-center rounded-[3px] bg-white text-[9px] font-bold text-black [text-shadow:none]">
-                {first.slice(0, 1)}
-              </span>
-            )}
+        <div className="relative z-20 flex h-7 items-center justify-between gap-2 bg-black/35 px-2 text-[11px] backdrop-blur-md [text-shadow:0_1px_2px_rgba(0,0,0,0.65)]">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="grid size-4 shrink-0 cursor-pointer place-items-center rounded-[3px] bg-white text-[9px] font-bold text-black [text-shadow:none]"
+              aria-label="Back to desk"
+            >
+              {first.slice(0, 1)}
+            </button>
             {(
               [
                 ["file", "File"],
@@ -811,7 +953,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
               <button
                 key={id}
                 type="button"
-                className={`cursor-pointer rounded px-1 hover:bg-white/15 ${compact ? "hidden" : ""}`}
+                className="cursor-pointer rounded px-1 hover:bg-white/15"
                 onClick={() => setMenu((current) => (current === id ? null : id))}
               >
                 {label}
@@ -871,7 +1013,19 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
         </div>
 
         <div className="relative z-10 h-[calc(100%-1.75rem)]" onClick={() => setMenu(null)}>
-          <div className={`desk-icons absolute top-2 right-3 bottom-14 z-20 w-[5.6rem] flex-col gap-1 overflow-y-auto pr-1 ${compact ? "hidden" : "flex"}`}>
+          <div className="desk-icons absolute top-2 right-1 bottom-16 z-20 grid w-[11.2rem] grid-flow-col grid-rows-5 content-start justify-items-center gap-y-1 overflow-y-auto sm:right-3 sm:bottom-14 sm:w-[5.6rem] sm:grid-flow-row sm:grid-rows-none sm:justify-items-stretch sm:gap-1">
+            <button
+              type="button"
+              onClick={() => setChatOpen(true)}
+              className={`flex cursor-pointer flex-col items-center gap-1 rounded px-1 py-1 ${
+                chatOpen ? "bg-[#3158c9]" : "hover:bg-white/10"
+              }`}
+            >
+              <DeskGlyph kind="ai" className="size-8" />
+              <span className="max-w-full text-center text-[10px] leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.85)] sm:text-[11px]">
+                Ask AI
+              </span>
+            </button>
             {items.map((item) => {
               const selected = active === item.id;
               return (
@@ -883,8 +1037,8 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
                     selected ? "bg-[#3158c9]" : "hover:bg-white/10"
                   }`}
                 >
-                  <DeskGlyph kind={item.kind} className="size-8" />
-                  <span className="max-w-full text-center text-[11px] leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.85)]">
+                  <DeskGlyph kind={item.kind} className="size-8 sm:size-8" />
+                  <span className="max-w-full text-center text-[10px] leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.85)] sm:text-[11px]">
                     {item.label}
                   </span>
                 </button>
@@ -892,26 +1046,50 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
             })}
           </div>
 
-          {active ? (
+          {active && !minimized ? (
             <section
-              className={`absolute z-10 flex flex-col overflow-hidden bg-[#e6e6e6] shadow-[0_22px_40px_rgba(0,0,0,0.45),0_0_0_1px_rgba(0,0,0,0.45)] ${
-                compact ? "top-8 right-1 bottom-12 left-1" : "top-1.5 right-[6.4rem] bottom-11 left-2"
+              className={`window-in absolute flex flex-col overflow-hidden bg-[#e6e6e6] shadow-[0_22px_40px_rgba(0,0,0,0.45),0_0_0_1px_rgba(0,0,0,0.45)] ${
+                maximized
+                  ? "inset-x-0 top-0 bottom-20 z-40"
+                  : compact
+                    ? "top-10 right-[5rem] bottom-16 left-2 z-10"
+                    : "top-1.5 right-[6.4rem] bottom-11 left-2 z-10"
               }`}
             >
               <div
-                className="relative flex h-7 shrink-0 items-center justify-center border-b border-[#8d8d8d] text-[12px] text-[#1a1a1a]"
+                className="relative flex h-10 shrink-0 items-center border-b border-[#8d8d8d] pr-[6.6rem] pl-3 text-[13px] text-[#1a1a1a]"
                 style={{
                   backgroundImage:
                     "repeating-linear-gradient(to bottom, #f7f7f7 0px, #f7f7f7 1px, #d5d5d5 1px, #d5d5d5 3px)",
                 }}
               >
-                <button
-                  type="button"
-                  aria-label={projectTitle ? "Back to projects" : "Close window"}
-                  onClick={closeWindow}
-                  className="absolute left-1.5 size-3 cursor-pointer border border-[#6a6a6a] bg-[#ececec] shadow-[inset_0_0_0_1px_#fff]"
-                />
-                <span className="max-w-[70%] truncate px-6 font-medium">{windowTitle}</span>
+                <span className="truncate font-medium">{windowTitle}</span>
+                <div className="absolute top-0 right-0 flex h-full">
+                  <button
+                    type="button"
+                    aria-label="Minimize"
+                    onClick={() => setMinimized(true)}
+                    className="grid w-9 cursor-pointer place-items-center border-l border-[#8d8d8d] bg-[#ececec] hover:bg-white"
+                  >
+                    <span className="block h-px w-3 bg-[#1a1a1a]" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={maximized ? "Restore" : "Maximize"}
+                    onClick={() => setMaximized((value) => !value)}
+                    className="grid w-9 cursor-pointer place-items-center border-l border-[#8d8d8d] bg-[#ececec] hover:bg-white"
+                  >
+                    <span className={`block size-2.5 border border-[#1a1a1a] ${maximized ? "shadow-[-3px_-3px_0_#ececec,inset_-3px_-3px_0_#ececec]" : ""}`} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={projectTitle ? "Back to projects" : "Close window"}
+                    onClick={closeWindow}
+                    className="grid w-9 cursor-pointer place-items-center border-l border-[#8d8d8d] bg-[#ececec] text-[15px] leading-none hover:bg-[#e81123] hover:text-white"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
               <WindowBody
                 id={active}
@@ -924,13 +1102,19 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
             </section>
           ) : null}
 
-          <nav className="absolute bottom-1 left-1/2 z-30 flex max-w-[98%] -translate-x-1/2 items-center gap-0.5 overflow-x-auto rounded-full border border-white/50 bg-white/80 px-1.5 py-1 text-[11px] text-[#1c1a16] shadow-[0_10px_24px_rgba(0,0,0,0.28)] backdrop-blur-md sm:bottom-2 sm:max-w-[94%] sm:px-2 sm:text-[12px]">
+          <nav className="absolute right-2 bottom-1 left-2 z-30 flex items-center gap-0.5 overflow-x-auto rounded-full border border-white/50 bg-white/80 px-1.5 py-1 text-[11px] text-[#1c1a16] shadow-[0_10px_24px_rgba(0,0,0,0.28)] backdrop-blur-md sm:bottom-2 sm:px-2 sm:text-[12px]">
             {dockOrder.map((id) => (
               <button
                 key={id}
                 type="button"
-                onClick={() => openDesk(id)}
-                className={`cursor-pointer rounded-full px-2.5 py-1 whitespace-nowrap ${
+                onClick={() => {
+                  if (active === id && minimized) {
+                    setMinimized(false);
+                    return;
+                  }
+                  openDesk(id);
+                }}
+                className={`min-h-9 cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap ${
                   active === id ? "bg-white font-semibold shadow-sm" : "hover:bg-white/70"
                 }`}
               >
@@ -940,7 +1124,7 @@ export function ProfileScreen({ content }: { content: PortfolioContent }) {
             <button
               type="button"
               onClick={() => setChatOpen(true)}
-              className={`cursor-pointer rounded-full px-2.5 py-1 whitespace-nowrap ${
+              className={`min-h-9 cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap ${
                 chatOpen ? "bg-white font-semibold shadow-sm" : "hover:bg-white/70"
               }`}
             >

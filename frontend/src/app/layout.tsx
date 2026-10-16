@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Outfit } from "next/font/google";
 
 import { BootScreen } from "@/components/boot/boot-screen";
@@ -25,6 +25,12 @@ const instrument = Instrument_Serif({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export function generateMetadata(): Metadata {
   const { profile } = getContent();
   return {
@@ -39,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
     <html lang="en" className={`${outfit.variable} ${instrument.variable}`}>
-      <body className="h-screen overflow-hidden bg-night font-sans text-cream antialiased">
+      <body className="h-dvh overflow-hidden bg-night font-sans text-cream antialiased">
         <ScreenProvider>
           <CinematicScene />
           <BootScreen name={profile.name} role={profile.role} company={profile.availability} />

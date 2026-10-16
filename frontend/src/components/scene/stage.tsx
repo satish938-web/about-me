@@ -10,6 +10,9 @@ import { useScreen } from "@/components/scene/screen-context";
 
 const screenEye = new THREE.Vector3(-0.35, 1.18, 0.82);
 const screenLook = new THREE.Vector3(-0.35, 1.18, -0.09);
+const portraitEye = new THREE.Vector3();
+const portraitLook = new THREE.Vector3(-0.35, 1.14, -0.13);
+const monitorCenter = new THREE.Vector3(-0.35, 1.16, -0.13);
 const screenCorners = [
   new THREE.Vector3(-0.74, 0.95, -0.09),
   new THREE.Vector3(0.04, 0.95, -0.09),
@@ -153,6 +156,14 @@ function Rig() {
     }
 
     const viewing = openRef.current;
+    const camera = state.camera as THREE.PerspectiveCamera;
+    const aspect = state.size.width / Math.max(state.size.height, 1);
+    const narrow = !viewing && aspect < 0.95;
+    const nextFov = narrow ? 64 : 32;
+    if (Math.abs(camera.fov - nextFov) > 0.1) {
+      camera.fov = nextFov;
+      camera.updateProjectionMatrix();
+    }
 
     if (viewing) {
       desired.current.copy(screenEye);
@@ -161,14 +172,13 @@ function Rig() {
       const progress = reduced.current ? 0 : scrollProgress.current * (studioCue.open ? reveal.current : 0);
       eyePath.getPointAt(progress, desired.current);
       lookPath.getPointAt(progress, target.current);
-      const aspect = state.size.width / Math.max(state.size.height, 1);
       if (aspect < 0.95) {
-        const tightness = Math.min(1, (0.95 - aspect) / 0.55);
-        desired.current.z += 2.15 * tightness;
-        desired.current.x = THREE.MathUtils.lerp(desired.current.x, -0.38, tightness);
-        desired.current.y = THREE.MathUtils.lerp(desired.current.y, 1.32, tightness);
-        target.current.x = THREE.MathUtils.lerp(target.current.x, -0.38, tightness);
-        target.current.y = THREE.MathUtils.lerp(target.current.y, 1.16, tightness);
+        const vfov = (64 * Math.PI) / 180;
+        const distance = 1.28 / (2 * Math.tan(vfov / 2) * Math.max(aspect, 0.32));
+        portraitEye.set(monitorCenter.x, 1.28, monitorCenter.z + distance);
+        const tightness = Math.min(1, (0.95 - aspect) / 0.4);
+        desired.current.lerp(portraitEye, tightness);
+        target.current.lerp(portraitLook, tightness);
       }
     }
 
@@ -268,7 +278,7 @@ function paintScreen(context: CanvasRenderingContext2D, blink: boolean, hot: boo
   context.fillText("satish@studio", 36, 72);
   context.fillStyle = "#e7eef4";
   context.font = "18px monospace";
-  context.fillText("software engineer", 36, 118);
+  context.fillText("software developer", 36, 118);
   context.fillStyle = hot ? "#e9fff2" : "#9fb0c0";
   const line = hot ? ">  open profile" : ">  click to open";
   context.fillText(line, 36, 188);
