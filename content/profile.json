@@ -1,0 +1,33 @@
+{
+  "name": "Satish Gupta",
+  "role": "Software engineer",
+  "location": "India",
+  "email": "satish202627@gmail.com",
+  "availability": "Victory Financial Consulting Pvt. Ltd.",
+  "summary": "I am currently working at Victory Financial Consulting Pvt. Ltd. as a software engineer. I have 2 years of experience.",
+  "about": [
+    "I build the public website, the staff panel, and the API they share.",
+    "The work is an HRMS and sales CRM, the loan site, and VFC Rise for MSME loans.",
+    "I completed a B.Tech from Bihar Engineering University (AKU). Mathematics and physics were my strongest subjects."
+  ],
+  "points": [
+    "I ship the screen and the API together, so the customer page and the staff desk stay on the same data.",
+    "I start from the record: a lead, a loan file, an employee, or a document. The page comes after that is clear.",
+    "AI assistants answer from saved company facts. Live rates, balances, and application status stay in the database.",
+    "Calls, WhatsApp, SMS, and file uploads sit on the same record they belong to, not in a separate tool.",
+    "I would rather finish one flow, from the button a person presses to the row saved in the database, than leave it half built."
+  ],
+  "education": [
+    {
+      "degree": "B.Tech",
+      "school": "Bihar Engineering University (AKU)",
+      "detail": "Completed. Strongest subjects were mathematics and physics."
+    }
+  ],
+  "links": [
+    { "label": "LinkedIn", "href": "https://www.linkedin.com/in/satish-gupta-4a3ab622b/" },
+    { "label": "GitHub · Satish-guptaw", "href": "https://github.com/Satish-guptaw" },
+    { "label": "GitHub · satish938-web", "href": "https://github.com/satish938-web" },
+    { "label": "VFC Loans", "href": "https://www.vfcloans.com/" }
+  ]
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "label": "Full stack",
+    "detail": "I take a product from the public page to the staff desk and the API. The same person ships all three.",
+    "items": ["React", "Next.js", "Node.js", "Express", "MongoDB", "REST APIs", "Socket.IO"]
+  },
+  {
+    "label": "Frontend",
+    "detail": "Marketing sites, customer dashboards, and admin panels. Motion, charts, and forms included.",
+    "items": ["JavaScript", "TypeScript", "Vite", "React Router", "Redux Toolkit", "Tailwind CSS", "Ant Design", "Bootstrap", "Material UI", "Framer Motion", "GSAP", "Chart.js"]
+  },
+  {
+    "label": "Backend",
+    "detail": "Login, files, live updates, and the database behind the website and the admin.",
+    "items": ["Express", "Mongoose", "JWT", "Google login", "OTP", "File uploads", "AWS S3", "Python"]
+  },
+  {
+    "label": "AI agents",
+    "detail": "Assistants on the loan site, the MSME desk, and this portfolio. They answer from saved company facts. Live rates and application status still come from the database.",
+    "items": ["Groq", "Site assistant", "Desk assistant", "Portfolio assistant"]
+  },
+  {
+    "label": "Calls and messages",
+    "detail": "Sales calls from the browser on a company number, plus SMS, email, and WhatsApp.",
+    "items": ["Plivo", "Call masking", "MSG91", "WhatsApp", "Email"]
+  },
+  {
+    "label": "Deploy",
+    "detail": "The site, the admin, and the API each go out on their own host.",
+    "items": ["Vercel", "Railway", "Firebase", "MongoDB Atlas", "Docker"]
+  },
+  {
+    "label": "Products",
+    "detail": "HR and sales inside the company, the public loan site, and the MSME desk.",
+    "items": ["HRMS", "Sales CRM", "Loan website", "MSME desk", "SEO pages"]
+  }
+]

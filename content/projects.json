@@ -1,0 +1,349 @@
+[
+  {
+    "title": "VFC HRMS & Sales CRM",
+    "year": "2024–2026",
+    "summary": "One product for Victory Financial Consulting (VFC), built as two apps in one codebase. The live app is hrms.vfcloans.com. HR and admin run the company. Sales employees run leads, calls, and loan cases.",
+    "tags": [
+      "React",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Socket.IO",
+      "Ant Design",
+      "Plivo",
+      "WhatsApp",
+      "Firebase",
+      "Railway",
+      "AWS S3",
+      "Python"
+    ],
+    "features": [
+      "HRMS for employees, attendance, leaves, salary slips, assets, tickets, and ID cards",
+      "Sales CRM for leads, masked calls, WhatsApp, follow-ups, and loan-case performance",
+      "Calling numbers verified with Airtel, Jio, and Truecaller so they are not marked as spam",
+      "Live updates for assignments, inbound messages, and who is on a call"
+    ],
+    "sections": [
+      {
+        "label": "HRMS",
+        "items": [
+          "Employee records, documents, and portal login control",
+          "Attendance from office biometric devices and a mobile face check",
+          "Leave requests and approvals",
+          "Salary slips",
+          "Company assets and agreements",
+          "Help-desk tickets",
+          "ID cards and branch visits",
+          "Birthday wishes"
+        ]
+      },
+      {
+        "label": "Sales CRM",
+        "items": [
+          "Lead upload and assignment to agents",
+          "Softphone calls on a masked company number",
+          "WhatsApp inbox on the company number",
+          "Follow-ups and a client pipeline",
+          "Loan case logging against targets",
+          "Call coach for dispositions",
+          "Live CRM presence and call recordings"
+        ]
+      },
+      {
+        "label": "Call masking",
+        "items": [
+          "The agent calls from the browser. The customer never sees the agent's personal number",
+          "The screen shows the company number from a pool of VFC caller IDs",
+          "Those numbers are verified with Airtel and Jio, and listed on Truecaller, so the call is not marked as spam",
+          "The pool rotates, with a daily limit on each number, so one line is not overused",
+          "Incoming and outgoing calls are saved on the lead, with the recording attached",
+          "If the softphone cannot connect, the call can fall back to a click-to-call voice line"
+        ]
+      }
+    ],
+    "href": "https://hrms.vfcloans.com/",
+    "shots": [
+      {
+        "src": "/projects/vfc/login.png",
+        "title": "Admin login",
+        "text": "The control room for HR and sales. Employees enter through a separate portal."
+      },
+      {
+        "src": "/projects/vfc/employees.png?v=2",
+        "title": "Employees",
+        "text": "The full roster. Search by name, email, or ID, and filter by office or company."
+      },
+      {
+        "src": "/projects/vfc/login-details.png",
+        "title": "Login control",
+        "text": "Turn an employee's portal on or off, or revoke it when they leave."
+      },
+      {
+        "src": "/projects/vfc/leaves.png",
+        "title": "Leaves",
+        "text": "Requests, approvals, and balances for the year, with paid and unpaid days."
+      },
+      {
+        "src": "/projects/vfc/salary.png",
+        "title": "Salary slips",
+        "text": "Pick an active employee and generate a slip from the salary template."
+      },
+      {
+        "src": "/projects/vfc/attendance.png",
+        "title": "Attendance upload",
+        "text": "Upload the month's attendance file for an office, then open the timesheet."
+      },
+      {
+        "src": "/projects/vfc/mobile-attendance.png",
+        "title": "Mobile attendance",
+        "text": "Field staff punch with a face check. Access is granted or revoked per person."
+      },
+      {
+        "src": "/projects/vfc/assets.png",
+        "title": "Assets",
+        "text": "Laptops and phones issued to the team, what is in use, and what has come back."
+      },
+      {
+        "src": "/projects/vfc/tickets.png",
+        "title": "Help desk",
+        "text": "Attendance corrections and other requests, from open through resolved."
+      },
+      {
+        "src": "/projects/vfc/id-cards.png",
+        "title": "ID cards",
+        "text": "A card for every employee, ready to preview or download by office."
+      },
+      {
+        "src": "/projects/vfc/sales-leads.png",
+        "title": "Sales leads",
+        "text": "Upload leads and assign a daily count. The agent gets a call button, not the raw number."
+      },
+      {
+        "src": "/projects/vfc/call-assign.png",
+        "title": "Call assign",
+        "text": "Choose a bucket such as fresh or ringing, then assign from today's upload."
+      },
+      {
+        "src": "/projects/vfc/person-leads.png",
+        "title": "Person leads",
+        "text": "Open one office and one salesperson to see their calls, recordings, and WhatsApp."
+      },
+      {
+        "src": "/projects/vfc/follow-ups.png",
+        "title": "Follow-ups",
+        "text": "A read-only view of each agent's pipeline, documents, and pending work."
+      },
+      {
+        "src": "/projects/vfc/live-calls.png",
+        "title": "Live calls",
+        "text": "The last two hours of calls: who connected, the direction, and the outcome."
+      },
+      {
+        "src": "/projects/vfc/crm-active.png",
+        "title": "Who is live",
+        "text": "Admins and agents inside the CRM right now, and which screen they are on."
+      },
+      {
+        "src": "/projects/vfc/whatsapp.png?v=2",
+        "title": "WhatsApp",
+        "text": "When an agent opens WhatsApp from a lead, the activity shows up here."
+      },
+      {
+        "src": "/projects/vfc/performance.png",
+        "title": "Performance",
+        "text": "Files logged and amount disbursed, set against the monthly target."
+      }
+    ]
+  },
+  {
+    "title": "VFC Loans",
+    "year": "2024–2026",
+    "summary": "The public website and staff panel for Victory Financial Consulting. Customers compare loans and apply on vfcloans.com. Staff run applications, leads, and documents from a separate admin panel. Both use one API.",
+    "tags": [
+      "React",
+      "React Router",
+      "Redux Toolkit",
+      "Vite",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Tailwind CSS",
+      "Socket.IO",
+      "Groq",
+      "Vercel",
+      "Railway"
+    ],
+    "features": [
+      "Public site for home loans, loan against property, business, vehicle, and personal loans",
+      "Customer dashboard for applications, documents, and notifications",
+      "Staff admin for leads, applications, bank rules, and credit reports",
+      "AI assistant that answers from the company's rates, offices, documents, and products"
+    ],
+    "sections": [
+      {
+        "label": "What it is",
+        "items": [
+          "Victory Financial Consulting is a loan distributor. It does not lend its own money",
+          "The site compares offers from about 30 banks and NBFCs and carries the customer through documents and disbursal",
+          "Offices: Gurugram (Spaze I-Tech Park, Sector 49), Noida (Wave Silver Tower, Sector 18), and Mumbai (Gundecha Enclave, Sakinaka)"
+        ]
+      },
+      {
+        "label": "Public site",
+        "items": [
+          "Home loan, home loan balance transfer, and home loan top-up",
+          "Loan against property, LAP balance transfer, and LAP top-up",
+          "Business loan, MSME loan, vehicle loan, and personal loan",
+          "Home Saver, an overdraft-linked home loan",
+          "EMI, eligibility, and affordability calculators",
+          "CIBIL / credit check",
+          "Bank-approved housing projects",
+          "City pages for Gurgaon, Gurugram, Noida, Delhi, and Faridabad",
+          "Blog, careers, gallery, and contact"
+        ]
+      },
+      {
+        "label": "Customer dashboard",
+        "items": [
+          "Logged-in customers get a profile, their applications, document upload, and notifications",
+          "An application moves through draft, submitted, processing, approved, rejected, and disbursed",
+          "Staff comments stay on the application"
+        ]
+      },
+      {
+        "label": "Admin panel",
+        "items": [
+          "A separate React app for staff, with its own login",
+          "Dashboard, customers, applications, leads, interests, contacts, and offers",
+          "Gallery, bank rules, credit reports, notifications, visitor analytics, and user management"
+        ]
+      },
+      {
+        "label": "AI assistant",
+        "items": [
+          "The button on the site says AI Assistant",
+          "The customer types a question. The reply is written from the company's rates, offices, documents, and products",
+          "Groq writes that reply",
+          "Live bank-rate comparisons and “track my application” come from the database, not from the model"
+        ]
+      },
+      {
+        "label": "Three apps",
+        "items": [
+          "Website: React single-page app on Vercel, at www.vfcloans.com. React Router for pages, Redux Toolkit for shared state, Tailwind, Bootstrap, and Material UI for layout",
+          "Animation with Framer Motion and GSAP. Forms with Formik, React Hook Form, and Yup. Google login and reCAPTCHA on forms",
+          "Each production build writes a sitemap and a separate HTML file per public URL, so search engines get that page's title and description",
+          "Admin: a second React app, built with Vite, also on Vercel",
+          "API: Node.js and Express on Railway, with MongoDB. The website calls the API through vfcloans.com, so the browser stays on the public site",
+          "Files go to object storage. Email, SMS, and WhatsApp campaigns go out from the API. Live updates use Socket.IO"
+        ]
+      }
+    ],
+    "href": "https://www.vfcloans.com/",
+    "shots": [
+      {
+        "src": "/projects/vfc-loans/noida.png",
+        "title": "Home loan in Noida",
+        "text": "A city page on the public site. Rates from 7.25% across 30+ banks, with home loan, loan against property, balance transfer, and top-up."
+      },
+      {
+        "src": "/projects/vfc-loans/dashboard.png",
+        "title": "Customer dashboard",
+        "text": "After sign-in: applications, documents, and profile. Counts show what is in review and what is approved."
+      }
+    ]
+  },
+  {
+    "title": "VFC Rise",
+    "year": "2025–2026",
+    "summary": "An MSME finance desk for VFC Rise Financial Services. It helps small businesses find a credit product, prepare documents, and send the file to a partner bank or NBFC. VFC Rise does not lend its own money. Sanction, rate, and disbursal stay with the lender.",
+    "tags": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vite",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Vercel",
+      "Railway"
+    ],
+    "features": [
+      "Public site for MSME loans, schemes, eligibility, documents, and an EMI calculator",
+      "Customer desk to apply, upload documents, see offers, and track the file",
+      "Staff desk to verify a lead, route it to a lender, and track commission",
+      "Sister brand of Victory Financial Consulting. Home loans stay on vfcloans.com"
+    ],
+    "sections": [
+      {
+        "label": "What it is",
+        "items": [
+          "A DSA desk for micro, small, and medium businesses in India. The site says plainly: we do not lend money",
+          "Products include working capital, GST overdraft and cash credit, term loans, machinery, loan against property, CGTMSE-style cover, PMEGP, and trade finance",
+          "For manufacturing, trading, services, and retail, with desks in Gurgaon, Noida, and Mumbai",
+          "Copy does not promise a sanction, a rate, or a subsidy. Consent is in Hindi and English",
+          "Public site: www.vfcrise.com. Email: hello@vfcrise.com"
+        ]
+      },
+      {
+        "label": "Public site",
+        "items": [
+          "A product catalog of about 23 MSME loans, plus how it works, sectors, and Udyam bands",
+          "Eligibility notes, document checklists, and long guides",
+          "Blog on MSME knowledge, business loans, and government schemes",
+          "Bank comparison, an indicative EMI calculator, partner logos, and FAQs",
+          "Offices, about, fair practices, grievance, privacy, and terms",
+          "A guest quick apply, and a full apply once the customer is signed in"
+        ]
+      },
+      {
+        "label": "Customer desk",
+        "items": [
+          "Sign in with email, Google, or a one-time code",
+          "Profile, applications, offers, a document vault, messages, and history",
+          "A file moves from submitted, through document checks and lender review, to approved, rejected, or disbursed",
+          "The customer can accept or decline an offer, and a desk assistant answers questions on the account"
+        ]
+      },
+      {
+        "label": "Staff desk",
+        "items": [
+          "A separate admin app for the DSA team, with its own login",
+          "Lead queue, partner lenders, commission, and reports",
+          "Staff verify documents, route a file to a bank or NBFC, then record the bank status and the offer",
+          "Website content and the product list can be edited from the desk",
+          "Support tickets, team access, and an audit log"
+        ]
+      },
+      {
+        "label": "Three apps",
+        "items": [
+          "Website: Next.js on Vercel, at www.vfcrise.com. Tailwind for layout. Pages stay useful for search, with a blog, guides, and city-style product pages",
+          "Admin: a React app built with Vite, at admin.vfcrise.com",
+          "API: Node.js and Express on Railway, with MongoDB, at api.vfcrise.com",
+          "The website and the admin both talk to that one API. Published site text can come from the database, and falls back to the copy shipped with the site if the API is down",
+          "SMS and email are used for sign-in codes. There is no customer payment checkout. Commission is tracked inside the staff desk"
+        ]
+      }
+    ],
+    "href": "https://www.vfcrise.com/",
+    "shots": [
+      {
+        "src": "/projects/vfc-rise/sectors.png",
+        "title": "Who it is for",
+        "text": "Four sectors: manufacturing, trading, services, and retail. Each one opens onto the loans that fit that business."
+      },
+      {
+        "src": "/projects/vfc-rise/services.png",
+        "title": "Loan catalog",
+        "text": "Working capital, cash credit, machinery, loan against property, PMEGP, and the rest of the MSME list, from one menu."
+      },
+      {
+        "src": "/projects/vfc-rise/dashboard.png",
+        "title": "Applicant dashboard",
+        "text": "After sign-in: applications, offers, and profile. A new file starts here, and sanction still stays with the lender."
+      }
+    ]
+  }
+]
